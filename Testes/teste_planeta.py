@@ -1,5 +1,5 @@
 import numpy as np
-from funcoes.Planeta import Planeta
+from Classes.Planeta import Planeta
 
 v = Planeta(np.array([1, 2, 3]), 1, 1)
 b = Planeta(np.array([1, 2, 3]), 1, 1)
