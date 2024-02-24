@@ -32,22 +32,26 @@ class Discretizacao:
         delta_t = T/n
 
         #definicao das funcoes para discretizar
-        d_v1 = lambda c1, c2, c3: c1.ac_rel(c2) + c1.ac_rel(c3)
-        d_v2 = lambda c1, c2, c3: c2.ac_rel(c1) + c2.ac_rel(c3)
-        d_v3 = lambda c1, c2, c3: c3.ac_rel(c2) + c3.ac_rel(c1)
-        d_r1 = lambda c1: c1.posicao
-        d_r2 = lambda c2: c2.posicao
-        d_r3 = lambda c3: c3.posicao
+        a1 = lambda c1, c2, c3: c1.ac_rel(c2) + c1.ac_rel(c3)
+        a2 = lambda c1, c2, c3: c2.ac_rel(c1) + c2.ac_rel(c3)
+        a3 = lambda c1, c2, c3: c3.ac_rel(c2) + c3.ac_rel(c1)
+        v = lambda c: c.velocidade
+        
 
         #loop para calcular os valores
         while t < T:
 
-            k_1 = delta_t*d_v1(corpo_1, corpo_2, corpo_3)
-            k_2 = delta_t*f(t + delta_t/2, y + k_1/2)
-            k_3 = delta_t*f(t +delta_t/2, y + k_2/2)
-            k_4 = delta_t*f(t + delta_t, y + k_3)
+            #para as posicoes
+            k = np.zeros(4,6)
+            
+            k1 = delta_t*v(corpo_1)
+            l1 = delta_t*a1(corpo_1, corpo_2, corpo_3)
 
-            v1_prox = corpo_1.velocidade + (k_1 + 2*k_2 + 2*k_3 + k_4)/6
+            k2 = delta_t*(v(corpo_1) + l1/2)
+            l2 = delta_t*a1(corpo_1 + k1/2, corpo_2, corpo_3)
+
+           
+            
 
 
             c1.velocidade = v1_prox
@@ -59,4 +63,7 @@ class Discretizacao:
             
              
             t += delta_t
- 
+
+    def calculaNovaVelocidade(c1, c2, c3, incremento, h):
+        cx = Planeta(c1.posicao + incremento*h, c1.massa, c1.velocidade)
+        return cx.velocidade + h*(cx.ac_rel(c2) + cx.ac_rel(c3))
