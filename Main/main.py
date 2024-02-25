@@ -13,5 +13,5 @@ corpo_3 = Planeta(np.array([3, 0]), massa, v_0)
 
 n = 100
 T = 1000
-
-print(disc.rungekutta_planetas(corpo_1, corpo_2, corpo_3, n, T))
+discretizacao = disc()
+print(discretizacao.rungekutta_planetas(corpo_1, corpo_2, corpo_3, n, T))

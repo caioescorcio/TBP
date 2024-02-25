@@ -3,7 +3,11 @@ from Classes.Planeta import Planeta
 
 class Discretizacao:
     
-    def rungekutta(y_0, f, n, intervalo_t):
+    def __init__(self):
+        pass
+        
+    
+    def rungekutta(self, y_0, f, n, intervalo_t):
         #discretizacao do intervalo
         h = (intervalo_t[1] - intervalo_t[0])/n
 
@@ -27,13 +31,13 @@ class Discretizacao:
             
         return v_t, v_y
     
-    def calculaNovaVelocidade(c1, c2, c3, incremento, h, k, l, i):
-        cx = Planeta(c1.posicao + incremento*k[i], c1.massa, c1.velocidade[i] + incremento*l[i])
-        cx_1 = Planeta(c2.posicao + incremento*k[(i+1)%3], c2.massa, c2.velocidade + incremento*l[(i+1)%3])
-        cx_2 = Planeta(c3.posicao + incremento*k[(i+2)%3], c3.massa, c3.velocidade + incremento*l[(i+2)%3])
+    def calculaNovaVelocidade(self, c1, c2, c3, incremento, h, k, l, c_idx, kl_idx):
+        cx = Planeta(c1.posicao + incremento*k[c_idx][kl_idx], c1.massa, c1.velocidade + incremento*l[c_idx][kl_idx])
+        cx_1 = Planeta(c2.posicao + incremento*k[(c_idx+1)%3][kl_idx], c2.massa, c2.velocidade + incremento*l[(c_idx+1)%3][kl_idx])
+        cx_2 = Planeta(c3.posicao + incremento*k[(c_idx+2)%3][kl_idx], c3.massa, c3.velocidade + incremento*l[(c_idx+2)%3][kl_idx])
         return cx.velocidade + h*(cx.ac_rel(c2) + cx.ac_rel(c3))
     
-    def rungekutta_planetas(corpo_1, corpo_2, corpo_3, n, T):
+    def rungekutta_planetas(self, corpo_1, corpo_2, corpo_3, n, T):
         #discretizacao do intervalo
         h = T/n
         
@@ -50,9 +54,8 @@ class Discretizacao:
         pos2 = [corpo_2.posicao]
         pos3 = [corpo_3.posicao]
         #array de termos do RK para posicao e velocidade
-        s = (3, 4)
-        k = np.array(s, dtype = object)
-        l = np.array(s)
+        k = np.zeros((3,4,2))
+        l = np.zeros((3,4,2))
         t = 0
         #loop para calcular os valores
         while t < T:
@@ -61,25 +64,25 @@ class Discretizacao:
             for i in range(3):
                 k[i][0] = h*(corpos[i].velocidade)
             for i in range(3):
-                l[i, 0] = h*a(corpos[i], corpos[(i+1)%3], corpos[(i+2)%3])
+                l[i][0] = h*a[i](corpos[i], corpos[(i+1)%3], corpos[(i+2)%3])
             
             #K2
             for i in range(3):
                 k[i,1] = h*(v(corpos[i]) + (l[i,0])/2)
             for i in range(3):
-                l[i,1] = h*calculaNovaVelocidade(corpos[i], corpos[(i+1)%3], corpos[(i+2)%3], 0.5, h, k, l, 0)
+                l[i,1] = h*self.calculaNovaVelocidade(corpos[i], corpos[(i+1)%3], corpos[(i+2)%3], 0.5, h, k, l, i, 0)
             
             #K3
             for i in range(3):
                 k[i,2] = h*(v(corpos[i]) + (l[i,1])/2)
             for i in range(3):
-                l[i,2] = h*calculaNovaVelocidade(corpos[i], corpos[(i+1)%3], corpos[(i+2)%3], 0.5, h, k, l, 1)
+                l[i,2] = h*self.calculaNovaVelocidade(corpos[i], corpos[(i+1)%3], corpos[(i+2)%3], 0.5, h, k, l, i, 1)
             
             #K4
             for i in range(3):
                 k[i,3] = h*(v(corpos[i]) + l[i,2])
             for i in range(3):
-                l[i,3] = h*calculaNovaVelocidade(corpos[i], corpos[(i+1)%3], corpos[(i+2)%3], 1, h, k, l, 2)
+                l[i,3] = h*self.calculaNovaVelocidade(corpos[i], corpos[(i+1)%3], corpos[(i+2)%3], 1, h, k, l, i, 2)
                
             #Atualizando os valores    
             for i in range(3):
