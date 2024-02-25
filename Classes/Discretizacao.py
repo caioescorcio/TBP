@@ -46,19 +46,22 @@ class Discretizacao:
         a3 = lambda c1, c2, c3: c3.ac_rel(c2) + c3.ac_rel(c1)
         a = [a1, a2, a3]
         v = lambda c: c.velocidade
-        
+        pos1 = [corpo_1.posicao]
+        pos2 = [corpo_2.posicao]
+        pos3 = [corpo_3.posicao]
         #array de termos do RK para posicao e velocidade
-        k = np.zeros(3,4)
-        l = np.zeros(3,4)
-
+        s = (3, 4)
+        k = np.array(s, dtype = object)
+        l = np.array(s)
+        t = 0
         #loop para calcular os valores
         while t < T:
             
             #K1
             for i in range(3):
-                k[i,0] = h*v(corpos[i])
+                k[i][0] = h*(corpos[i].velocidade)
             for i in range(3):
-                l[i,0] = h*a(corpos[i], corpos[(i+1)%3], corpos[(i+2)%3])
+                l[i, 0] = h*a(corpos[i], corpos[(i+1)%3], corpos[(i+2)%3])
             
             #K2
             for i in range(3):
@@ -83,8 +86,11 @@ class Discretizacao:
                 corpos[i].posicao = corpos[i].posicao + (k[i,0] + 2*k[i,1] + 2*k[i,2] + k[i,3])/6
                 corpos[i].velocidade = corpos[i].velocidade + (l[i,0] + 2*l[i,1] + 2*l[i,2] + l[i,3])/6
 
-             
+            
+            pos1.append(corpos[0].posicao)
+            pos2.append(corpos[1].posicao)
+            pos3.append(corpos[2].posicao)
             t += h
             
-        return corpos[0], corpos[1], corpos[2]
+        return pos1, pos2, pos3
 
