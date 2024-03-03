@@ -6,15 +6,15 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
 #massa padrao de todos os planetas
-massa = 2
+massa = 10**8
 v_0 = np.array([0, 0])
 
 corpo_1 = Planeta(np.array([0, 0]), massa, v_0)
-corpo_2 = Planeta(np.array([3, 0]), massa, v_0)
-corpo_3 = Planeta(np.array([0, 4]), massa, v_0)
+corpo_2 = Planeta(np.array([3*1000, 0]), massa, v_0)
+corpo_3 = Planeta(np.array([0, 4*1000]), massa, v_0)
 labels = ['Corpo 1', 'Corpo 2', 'Corpo 3']
-n = 100
-T = 1
+n = 1500
+T = 20
 discretizacao = disc()
 np.set_printoptions(threshold=np.inf)
 pos1, pos2, pos3 = discretizacao.rungekutta_planetas(corpo_1, corpo_2, corpo_3, n, T)
@@ -42,7 +42,7 @@ def update(frame):
     return line1, line2, line3
 
 # Create the animation
-ani = FuncAnimation(fig, update, frames=len(pos1), interval=10, blit=True)
+ani = FuncAnimation(fig, update, frames=len(pos1), interval=1, blit=True)
 
 # Show the plot
 plt.show()
