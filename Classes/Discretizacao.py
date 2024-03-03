@@ -37,9 +37,9 @@ class Discretizacao:
     def rungekutta_planetas(self, corpo_1, corpo_2, corpo_3, n, T):
 
         def nova_ac(corpo_atual, corpo_outro_1, corpo_outro_2, h, k, k1, k2, l, l1, l2):
-            corpo_aux = Planeta(corpo_atual.posicao + k*h, corpo_atual.massa, corpo_atual.velocidade + l*h)
-            corpo_aux1 = Planeta(corpo_outro_1.posicao + k1*h, corpo_outro_1.massa, corpo_outro_1.velocidade + l1*h)
-            corpo_aux2 = Planeta(corpo_outro_2.posicao + k2*h, corpo_outro_2.massa, corpo_outro_2.velocidade + l2*h)
+            corpo_aux = Planeta(corpo_atual.posicao + k*h + l*h*h, corpo_atual.massa, corpo_atual.velocidade)
+            corpo_aux1 = Planeta(corpo_outro_1.posicao + k1*h + l1*h*h, corpo_outro_1.massa, corpo_outro_1.velocidade)
+            corpo_aux2 = Planeta(corpo_outro_2.posicao + k2*h + l2*h*h, corpo_outro_2.massa, corpo_outro_2.velocidade)
             
             return corpo_aux.ac_rel(corpo_aux1) + corpo_aux.ac_rel(corpo_aux2)
         
