@@ -1,7 +1,7 @@
 import numpy as np
 
 #Definicao de variaveis globais
-G = 1 #fonte: https://pt.wikipedia.org/wiki/Constante_gravitacional_universal
+G = 6.6743*(10**(-11)) #fonte: https://pt.wikipedia.org/wiki/Constante_gravitacional_universal 6,6743 × 10-11
 
 class Planeta:
     
@@ -23,7 +23,7 @@ class Planeta:
     def ac_rel (self, planeta_outro):
         ac = np.array([0, 0, 0])
         if(np.any(self.posicao != planeta_outro.posicao)):
-            ac = (-1)*G*(planeta_outro.massa)*np.subtract(self.posicao, planeta_outro.posicao)/(Planeta.distancia(self, planeta_outro)**3) #ac_rel 1 para 2 = -G*(R_1 - R_2)/d^3
+            ac = ((-1)*G*(planeta_outro.massa)*np.subtract(self.posicao, planeta_outro.posicao))/(Planeta.distancia(self, planeta_outro)**3) #ac_rel 1 para 2 = -G*(R_1 - R_2)/d^3
         return ac
     
 
