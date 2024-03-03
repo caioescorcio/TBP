@@ -36,9 +36,12 @@ class Discretizacao:
     
     def rungekutta_planetas(self, corpo_1, corpo_2, corpo_3, n, T):
 
-        def nova_ac(corpo_atual, corpo_outro_1, corpo_outro_2, h, k):
+        def nova_ac(corpo_atual, corpo_outro_1, corpo_outro_2, h, k, k1, k2, l, l1, l2):
             corpo_aux = Planeta(corpo_atual.posicao + k*h, corpo_atual.massa, corpo_atual.velocidade)
-            return corpo_aux.ac_rel(corpo_outro_1) + corpo_aux.ac_rel(corpo_outro_2)
+            corpo_aux1 = Planeta(corpo_outro_1.posicao + k1*h, corpo_outro_1.massa, corpo_outro_1.velocidade)
+            corpo_aux2 = Planeta(corpo_outro_2.posicao + k2*h, corpo_outro_2.massa, corpo_outro_2.velocidade)
+            
+            return corpo_aux.ac_rel(corpo_aux1) + corpo_aux.ac_rel(corpo_aux2)
         
         #discretizacao do intervalo
         h = T/n
@@ -60,54 +63,55 @@ class Discretizacao:
         
         t = 0
         #loop para calcular os valores
-        while t < T:
+        while t < 20*T:
 
-            #corpo 1
+            #K1
             kr1_1 = v(corpo_1)
             kv1_1 = a1(corpo_1, corpo_2, corpo_3)
+            
+            kr1_2 = v(corpo_2)
+            kv1_2 = a2(corpo_1, corpo_2, corpo_3)
+            
+            kr1_3 = v(corpo_3)
+            kv1_3 = a3(corpo_1, corpo_2, corpo_3)
 
+            #K2
             kr2_1 = v(corpo_1) + h*kv1_1/2
-            kv2_1 = nova_ac(corpo_1, corpo_2, corpo_3, h/2, kr1_1)
+            kv2_1 = nova_ac(corpo_1, corpo_2, corpo_3, h/2, kr1_1, kr1_2, kr1_3)
 
+            kr2_2 = v(corpo_2) + h*kv1_2/2
+            kv2_2 = nova_ac(corpo_2, corpo_1, corpo_3, h/2, kr1_2, kr1_1, kr1_3)
+
+            kr2_3 = v(corpo_3) + h*kv1_3/2
+            kv2_3 = nova_ac(corpo_3, corpo_1, corpo_2, h/2, kr1_3, kr1_1, kr1_2)
+
+            #K3
             kr3_1 = v(corpo_1) + h*kv2_1/2
-            kv3_1 = nova_ac(corpo_1, corpo_2, corpo_3, h/2, kr2_1)
+            kv3_1 = nova_ac(corpo_1, corpo_2, corpo_3, h/2, kr2_1, kr2_2, kr2_3)
 
+            kr3_2 = v(corpo_2) + h*kv2_2/2
+            kv3_2 = nova_ac(corpo_2, corpo_1, corpo_3, h/2, kr2_2, kr2_1, kr2_3)
+            
+            kr3_3 = v(corpo_3) + h*kv2_3/2
+            kv3_3 = nova_ac(corpo_3, corpo_1, corpo_2, h/2, kr2_3, kr2_1, kr2_2)
+
+            #K4
             kr4_1 = v(corpo_1) + h*kv3_1
-            kv4_1 = nova_ac(corpo_1, corpo_2, corpo_3, h, kr3_1)
+            kv4_1 = nova_ac(corpo_1, corpo_2, corpo_3, h, kr3_1, kr3_2, kr3_3)
+
+            kr4_2 = v(corpo_2) + h*kv3_2
+            kv4_2 = nova_ac(corpo_2, corpo_1, corpo_3, h, kr3_2, kr3_1, kr3_3)
+
+            kr4_3 = v(corpo_3) + h*kv3_3
+            kv4_3 = nova_ac(corpo_3, corpo_1, corpo_2, h, kr3_3, kr3_1, kr3_2)
 
             corpo_1.posicao    = corpo_1.posicao + h*(kr1_1 +2*kr2_1 + 2*kr3_1 + kr4_1)/6
             corpo_1.velocidade = corpo_1.velocidade +h*(kv1_1 +2*kv2_1 + 2*kv3_1 + kv4_1)/6
             pos1 = np.vstack([pos1, corpo_1.posicao])
 
-            #corpo 2
-            kr1_2 = v(corpo_2)
-            kv1_2 = a2(corpo_1, corpo_2, corpo_3)
-
-            kr2_2 = v(corpo_2) + h*kv1_2/2
-            kv2_2 = nova_ac(corpo_2, corpo_1, corpo_3, h/2, kr1_2)
-
-            kr3_2 = v(corpo_2) + h*kv2_2/2
-            kv3_2 = nova_ac(corpo_2, corpo_1, corpo_3, h/2, kr2_2)
-
-            kr4_2 = v(corpo_2) + h*kv3_2
-            kv4_2 = nova_ac(corpo_2, corpo_1, corpo_3, h, kr3_2)
-
             corpo_2.posicao    = corpo_2.posicao + h*(kr1_2 +2*kr2_2 + 2*kr3_2 + kr4_2)/6
             corpo_2.velocidade = corpo_2.velocidade +h*(kv1_2 +2*kv2_2 + 2*kv3_2 + kv4_2)/6
             pos2 = np.vstack([pos2, corpo_2.posicao])
-
-            #corpo 3
-            kr1_3 = v(corpo_3)
-            kv1_3 = a3(corpo_1, corpo_2, corpo_3)
-
-            kr2_3 = v(corpo_3) + h*kv1_3/2
-            kv2_3 = nova_ac(corpo_3, corpo_1, corpo_2, h/2, kr1_3)
-
-            kr3_3 = v(corpo_3) + h*kv2_3/2
-            kv3_3 = nova_ac(corpo_3, corpo_1, corpo_2, h/2, kr2_3)
-
-            kr4_3 = v(corpo_3) + h*kv3_3
-            kv4_3 = nova_ac(corpo_3, corpo_1, corpo_2, h, kr3_3)
 
             corpo_3.posicao    = corpo_3.posicao + h*(kr1_3 +2*kr2_3 + 2*kr3_3 + kr4_3)/6
             corpo_3.velocidade = corpo_3.velocidade +h*(kv1_3 +2*kv2_3 + 2*kv3_3 + kv4_3)/6

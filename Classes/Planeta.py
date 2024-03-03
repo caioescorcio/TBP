@@ -1,7 +1,7 @@
 import numpy as np
 
 #Definicao de variaveis globais
-G = 6.674184*(10**(-11)) #fonte: https://pt.wikipedia.org/wiki/Constante_gravitacional_universal
+G = 1 #fonte: https://pt.wikipedia.org/wiki/Constante_gravitacional_universal
 
 class Planeta:
     
