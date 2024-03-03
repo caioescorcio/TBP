@@ -60,35 +60,49 @@ class Plot:
         plt.title('Animated Plot of Body Position')
         plt.show()
 
-        def plot_CORPOS(matrices, labels):
-            fig, ax = plt.subplots()
-            lines = [ax.plot([], [], '-', label=label)[0] for label in labels]
-            points = [ax.plot([], [], 'o', color=line.get_color())[0] for line in lines]
+    def plot_CORPOS(matrices, labels):
+        fig, ax = plt.subplots()
+        lines = [ax.plot([], [], '-', label=label)[0] for label in labels]
+        points = [ax.plot([], [], 'o', color=line.get_color())[0] for line in lines]
 
-            buffers = [(0.05 * (matrix[:, 0].max() - matrix[:, 0].min()),
-                        0.05 * (matrix[:, 1].max() - matrix[:, 1].min())) for matrix in matrices]
-            
-            def init():
-                for line, point in zip(lines, points):
-                    line.set_data([], [])
-                    point.set_data([], [])
-                ax.set_xlim(min([matrix[:, 0].min() for matrix in matrices]) - max([buffer[0] for buffer in buffers]),
-                            max([matrix[:, 0].max() for matrix in matrices]) + max([buffer[0] for buffer in buffers]))
-                ax.set_ylim(min([matrix[:, 1].min() for matrix in matrices]) - max([buffer[1] for buffer in buffers]),
-                            max([matrix[:, 1].max() for matrix in matrices]) + max([buffer[1] for buffer in buffers]))
-                ax.grid(True)
-                ax.legend()
-                return lines + points
+        buffers = [(0.05 * (matrix[:, 0].max() - matrix[:, 0].min()),
+                    0.05 * (matrix[:, 1].max() - matrix[:, 1].min())) for matrix in matrices]
+        
+        def init():
+            for line, point in zip(lines, points):
+                line.set_data([], [])
+                point.set_data([], [])
+            ax.set_xlim(min([matrix[:, 0].min() for matrix in matrices]) - max([buffer[0] for buffer in buffers]),
+                        max([matrix[:, 0].max() for matrix in matrices]) + max([buffer[0] for buffer in buffers]))
+            ax.set_ylim(min([matrix[:, 1].min() for matrix in matrices]) - max([buffer[1] for buffer in buffers]),
+                        max([matrix[:, 1].max() for matrix in matrices]) + max([buffer[1] for buffer in buffers]))
+            ax.grid(True)
+            ax.legend()
+            return lines + points
 
-            def update(frame):
-                for line, point, matrix in zip(lines, points, matrices):
-                    line.set_data(matrix[:frame, 0], matrix[:frame, 1])
-                    point.set_data([matrix[frame-1, 0]], [matrix[frame-1, 1]])
+        def update(frame):
+            for line, point, matrix in zip(lines, points, matrices):
+                line.set_data(matrix[:frame, 0], matrix[:frame, 1])
+                point.set_data([matrix[frame-1, 0]], [matrix[frame-1, 1]])
 
-                return lines + points
+            return lines + points
 
-            ani = FuncAnimation(fig, update, frames=min([len(matrix) for matrix in matrices])+1, init_func=init, blit=True, interval=50)
-            plt.xlabel('x')
-            plt.ylabel('y')
-            plt.title('Animated Plot of Body Position')
-            plt.show()
+        ani = FuncAnimation(fig, update, frames=min([len(matrix) for matrix in matrices])+1, init_func=init, blit=True, interval=1000)
+        plt.xlabel('x')
+        plt.ylabel('y')
+        plt.title('Animated Plot of Body Position')
+        plt.show()
+
+
+    
+    def plot_positions(pos1, pos2, pos3):
+        fig, ax = plt.subplots(figsize=(8, 6))
+        ax.plot([pos[0] for pos in pos1], [pos[1] for pos in pos1], label='Corpo 1')
+        ax.plot([pos[0] for pos in pos2], [pos[1] for pos in pos2], label='Corpo 2')
+        ax.plot([pos[0] for pos in pos3], [pos[1] for pos in pos3], label='Corpo 3')
+        ax.set_xlabel('X Position')
+        ax.set_ylabel('Y Position')
+        ax.set_title('Positions of Planets')
+        ax.legend()
+        plt.grid(True)
+        plt.show()

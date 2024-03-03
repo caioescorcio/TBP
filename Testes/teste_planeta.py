@@ -10,11 +10,13 @@ v = Planeta(np.array([1, 2, 3]), 1, 1)
 b = Planeta(np.array([2, 2, 3]), 1, 1)
 print(v.distancia(b))
 print(v.ac_rel(b), " \n")
+print(b.ac_rel(v), " \n")
 
 v = Planeta(np.array([1, 2, 3]), 1, 1)
 b = Planeta(np.array([2, 1, 3]), 1, 1)
 print(v.distancia(b))
 print(v.ac_rel(b)," \n")
+print(b.ac_rel(v), " \n")
 
 #massa padrao de todos os planetas
 massa = 10**9
