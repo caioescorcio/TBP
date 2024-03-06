@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 
 #massa padrao de todos os planetas
-massa = 6.6743*(10**(8))
+massa = 10
 v_0 = np.array([0, 0])
 
 corpo_1 = Planeta(np.array([0, 0]), massa, v_0)

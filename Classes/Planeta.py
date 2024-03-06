@@ -1,7 +1,7 @@
 import numpy as np
 
 #Definicao de variaveis globais
-G = 6.6743*(10**(-11)) #fonte: https://pt.wikipedia.org/wiki/Constante_gravitacional_universal 6,6743 × 10-11
+G = 1 #fonte: https://pt.wikipedia.org/wiki/Constante_gravitacional_universal 6,6743 × 10-11
 
 class Planeta:
     
@@ -21,9 +21,14 @@ class Planeta:
     
     #Calcula a aceleracao causada em um planeta por outro planeta
     def ac_rel (self, planeta_outro):
-        ac = np.array([0, 0, 0])
-        if(np.any(self.posicao != planeta_outro.posicao)):
+        ac = np.array([0, 0])
+        if(np.any(self.posicao != planeta_outro.posicao) and self.distancia(planeta_outro) > 0.26):
             ac = ((-1)*G*(planeta_outro.massa)*np.subtract(self.posicao, planeta_outro.posicao))/(Planeta.distancia(self, planeta_outro)**3) #ac_rel 1 para 2 = -G*(R_1 - R_2)/d^3
+        else:
+            a = self.velocidade
+            self.velocidade = planeta_outro.velocidade
+            planeta_outro.velocidade = a
+            
         return ac
     
 

@@ -63,7 +63,7 @@ class Discretizacao:
         
         t = 0
         #loop para calcular os valores
-        while t < 50*T:
+        while t < 30*T:
 
             #K1
             kr1_1 = v(corpo_1)
