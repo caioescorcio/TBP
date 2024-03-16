@@ -4,6 +4,10 @@ from Classes.Plot import Plot as plot
 from Classes.Planeta import Planeta
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
+from scipy.interpolate import CubicSpline
+import plotly.graph_objects as go
+import plotly.express as px
+
 
 #massa padrao de todos os planetas
 massa = 1
@@ -47,6 +51,36 @@ def update(frame):
 
 # Create the animation
 ani = FuncAnimation(fig, update, frames=len(pos1), interval=1, blit=True)
-
-# Show the plot
 plt.show()
+
+#SPLINE CUBICO
+pos_stack = np.array( [pos1, pos2, pos3] )
+t = np.linspace(0, 30*T, len(pos1[:,0]))
+t_plot = np.arange(0, 30*T,  T/(20*n))
+csx = np.array(list(map( lambda pos: CubicSpline(t, pos[:, 0], bc_type = 'natural'), pos_stack)))
+csy = np.array(list(map( lambda pos: CubicSpline(t, pos[:, 1], bc_type = 'natural'), pos_stack)))
+
+# Create figure
+fig = go.Figure()
+
+# Add real values
+fig.add_trace(go.Scatter(x=pos1[:, 0], y=pos1[:, 1], mode='lines', name='Real Pos1'))
+# fig.add_trace(go.Scatter(x=pos2[:, 0], y=pos2[:, 1], mode='lines', name='Real Pos2'))
+# fig.add_trace(go.Scatter(x=pos3[:, 0], y=pos3[:, 1], mode='lines', name='Real Pos3'))
+
+# # Add spline predictions
+# for i in range(len(pos_stack)):
+#     fig.add_trace(go.Scatter(x=csx[i](t_plot), y=csy[i](t_plot), mode='lines', name=f'Spline Pos{i+1}'))
+fig.add_trace(go.Scatter(x=csx[0](t_plot)[0:], y=csy[0](t_plot)[0:], mode='lines', name=f'Spline Pos 1'))
+
+# Set layout
+fig.update_layout(
+    title='Movimento de tres bolas',
+    xaxis_title='X (m)',
+    yaxis_title='Y (m)',
+    legend_title='Legend',
+    showlegend=True
+)
+fig.show()
+
+
