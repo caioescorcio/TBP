@@ -26,8 +26,8 @@ pos1, pos2, pos3 = discretizacao.rungekutta_planetas(corpo_1, corpo_2, corpo_3, 
 
 fig, ax = plt.subplots()
 
-ax.set_xlim(-a - a / 4, a + a / 4)
-ax.set_ylim(-b - b / 4, b + b / 4)
+ax.set_xlim(-1.5, 1.5)
+ax.set_ylim(-1.5, 1.5)
 
 # Create empty lines for the plot
 line1, = ax.plot([], [], 'r-', lw=2)
@@ -44,9 +44,21 @@ def update(frame):
     line1.set_data(pos1[:frame, 0], pos1[:frame, 1])
     line2.set_data(pos2[:frame, 0], pos2[:frame, 1])
     line3.set_data(pos3[:frame, 0], pos3[:frame, 1])
-    ball1.set_data(pos1[frame, 0], pos1[frame, 1])
-    ball2.set_data(pos2[frame, 0], pos2[frame, 1])
-    ball3.set_data(pos3[frame, 0], pos3[frame, 1])
+
+# Create empty scatter plots for the balls
+ball1, = ax.plot([], [], 'ro', markersize=5)
+ball2, = ax.plot([], [], 'go', markersize=5)
+ball3, = ax.plot([], [], 'bo', markersize=5)
+
+# Animation function
+def update(frame):
+    line1.set_data(pos1[:frame, 0], pos1[:frame, 1])
+    line2.set_data(pos2[:frame, 0], pos2[:frame, 1])
+    line3.set_data(pos3[:frame, 0], pos3[:frame, 1])
+    ball1.set_data([pos1[frame, 0]], [pos1[frame, 1]])
+    ball2.set_data([pos2[frame, 0]], [pos2[frame, 1]])
+    ball3.set_data([pos3[frame, 0]], [pos3[frame, 1]])
+
     return line1, line2, line3, ball1, ball2, ball3
 
 # Create the animation
