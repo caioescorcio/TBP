@@ -3,6 +3,7 @@ from Classes.Discretizacao import Discretizacao as disc
 from Classes.Plot import Plot as plot
 from Classes.Planeta import Planeta
 from Classes.Splines import CubicSpline
+#from scipy.interpolate import CubicSpline
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import plotly.graph_objects as go
@@ -69,8 +70,8 @@ plt.show()
 pos_stack = np.array( [pos1, pos2, pos3] )
 t = np.linspace(0, 30*T, len(pos1[:,0]))
 t_plot = np.arange(0, 30*T,  T/(20*n))
-csx = np.array(list(map(lambda pos: CubicSpline(t, pos[:, 0]), pos_stack)))
-csy = np.array(list(map(lambda pos: CubicSpline(t, pos[:, 1]), pos_stack)))
+csx = np.array(list(map( lambda pos: CubicSpline(t, pos[:, 0]), pos_stack)))
+csy = np.array(list(map( lambda pos: CubicSpline(t, pos[:, 1]), pos_stack)))
 
 # Create figure
 fig = go.Figure()
@@ -93,6 +94,7 @@ fig.update_layout(
     legend_title='Legend',
     showlegend=True
 )
+
 fig.show()
 
 

@@ -8,11 +8,12 @@ class CubicSpline():
         assert len(x) == len(y), "x e y devem ter o mesmo tamanho!"
         self.x = x
         self.y = y
-        self.n = len(x) #tamanho do array
+        self.n = len(x) #tamanho do array (OBS: self.n = 'n' + 1 do livro!)
         
         #ALGORITMO DO SPLINE NATURAL: LIVRO DO BURDEN PAG 149
         #PASSO 1
         self.h = np.diff(x) #deltas x (h[0] = x[1] - x[0])
+                            #h vai de 0 ate n-1
         
         #PASSO 2
         self.alpha = np.zeros(self.n)
@@ -41,15 +42,20 @@ class CubicSpline():
         self.b = np.zeros(self.n)
         self.d = np.zeros(self.n)
         
-        self.c[self.n-2::-1] = self.z[self.n-2::-1] - self.mu[self.n-2::-1]*self.c[self.n-1::-1]
-        self.b[self.n-2::-1] = (self.y[self.n-1:self.n-1:-1] - self.y[self.n-2::-1])/self.h[self.n-2::-1] - self.h[self.n-2::-1]*(self.c[self.n-1::-1] + 2*self.c[self.n-2::-1])/3
-        self.d[self.n-2::-1] = (self.c[self.n-1::-1] - self.c[self.n-2::-1])/(3*self.h[self.n-2::-1])
+        print(len(self.c), len(self.z), len(self.mu), len(self.y), len(self.h), len(self.b))
+        print(len(self.c[-1:1:-1]), len( 2*self.c[-2:0:-1]))
+        for i in range(self.n-2, 0, -1):
+            self.c[i] = self.z[i] - self.mu[i]*self.c[i+1]
+            
+            self.b[i] = (self.y[i+1] - self.y[i])/self.h[i] - self.h[i]*(self.c[i+1] + 2*self.c[i])/3
+            
+            self.d[i] = (self.c[i+1] - self.c[i])/(3*self.h[i])
 
         #PASSO 7
-        self.splines = np.vstack((self.y, self.b, self.c, self.d)).T
+        self.splines = np.vstack((self.y[0:-1], self.b[0:-1], self.c[0:-1], self.d[0:-1])).T
         
     def __call__(self, x): #recebe um vetor X para devolver um vetor Y interpolado pelo spline cubico
-        y = x.apply(self.Substitui)
+        y = np.vectorize(self.Substitui)(x)
         return y
         
     def Substitui(self, x):
