@@ -1,7 +1,5 @@
 import numpy as np
 from Classes.Planeta import Planeta
-import matplotlib.pyplot as plt
-from matplotlib.animation import FuncAnimation
 
 class Discretizacao:
     

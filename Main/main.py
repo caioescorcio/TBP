@@ -1,13 +1,11 @@
 import numpy as np
 from Classes.Discretizacao import Discretizacao as disc
-from Classes.Plot import Plot as plot
 from Classes.Planeta import Planeta
 from Classes.Splines import CubicSpline
 #from scipy.interpolate import CubicSpline
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import plotly.graph_objects as go
-import plotly.express as px
 
 
 #massa padrao de todos os planetas
