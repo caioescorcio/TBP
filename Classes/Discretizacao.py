@@ -42,23 +42,22 @@ class Discretizacao:
         return k
 
     #phi generico
-    def phi(self, t, y, h):
-        #declarando phi do Runge-Kutta
-        #PLANETA
-        # k_1 = h*self.f(t, y)
-        # k_2 = h*self.f(t + h/2, y + k_1/2)
-        # k_3 = h*self.f(t + h/2, y + k_2/2)
-        # k_4 = h*self.f(t + h, y + k_3)
+    def phi(self, t, y, h, TBP):
         
-        #MANUFATURADA
-        k_1 = h*self.f_manufaturada(t, y)
-        k_2 = h*self.f_manufaturada(t + h/2, y + k_1/2)
-        k_3 = h*self.f_manufaturada(t + h/2, y + k_2/2)
-        k_4 = h*self.f_manufaturada(t + h, y + k_3)
+        if TBP:
+            func = self.f
+        else:
+            func = self.f_manufaturada
+        #declarando phi do Runge-Kutta
+        k_1 = h*func(t, y)
+        k_2 = h*func(t + h/2, y + k_1/2)
+        k_3 = h*func(t + h/2, y + k_2/2)
+        k_4 = h*func(t + h, y + k_3)
 
         return (k_1 + 2*k_2 + 2*k_3 + k_4)/6
 
-    def f_manufaturada(self, t, y): #f = y' ; y = e^(3t)*sin(5t) - 5; y(0) = -5
+    def f_manufaturada(self, t, y): 
+        """f = y' ; y = e^(3t)*sin(5t) - 5; y(0) = -5"""
         return np.exp(3*t)*3*np.sin(5*t) + 5*np.exp(3*t)*np.cos(5*t)
     
     def exata_manufaturada(self, t):
@@ -66,65 +65,65 @@ class Discretizacao:
         return np.exp(3*t)*np.sin(5*t) - 5
 
     #metodo de discretizacao
-    def calcula(self, n, intervalo_t, dim):
+    def calcula(self, n, intervalo_t, dim, TBP):
         #discretizacao do intervalo
         h = (intervalo_t[1] - intervalo_t[0])/n
 
-        #inicializacao das variaveis
-        i = 0
-        #PLANETAS
-        # t_k = np.zeros((30*n+1, 1))
-        # y_k = np.zeros((30*n+1, dim))
-        
-        #MANUFATURA
-        t_k = np.zeros((n+1, 1))
-        y_k = np.zeros((n+1, dim))
+        if TBP:
+            #PLANETAS
+            #inicializacao das variaveis
+            i = 0
+            t_k = np.zeros((30*n+1, 1))
+            y_k = np.zeros((30*n+1, dim))
+            
+            #inicializacao das condicoes iniciais
+            t_k[0] = intervalo_t[0]
+            y_k[0] = np.array([
+                -0.97000436, 0.24308753,        #R_1: 0, 1
+                0.97000436, -0.24308753,        #R_2: 2, 3
+                0, 0,                           #R_3: 4, 5
 
-        #inicializacao das condicoes iniciais
-        t_k[0] = intervalo_t[0]
-        #PLANETAS
-        # y_k[0] = np.array([
-        #     -0.97000436, 0.24308753,        #R_1: 0, 1
-        #     0.97000436, -0.24308753,        #R_2: 2, 3
-        #     0, 0,                           #R_3: 4, 5
-
-        #     0.4662036850, 0.4323657300,     #V_1: 6, 7
-        #     0.4662036850, 0.4323657300,     #V_2: 8, 9
-        #     -0.93240737, -0.86473146        #V_3: 10, 11
-        # ])  
-        
-        #MANUFATURA
-        y_k[0] = np.array([-5])
-        
-
+                0.4662036850, 0.4323657300,     #V_1: 6, 7
+                0.4662036850, 0.4323657300,     #V_2: 8, 9
+                -0.93240737, -0.86473146        #V_3: 10, 11
+            ])  
+            #loop para calcular valores de y        
+            for i in range(30*n):
+                y_k[i+1] = y_k[i] + self.phi(t_k[i], y_k[i], h, TBP)
+                t_k[i+1] = t_k[i] + h
+            
+        else:
+            #MANUFATURA
+            t_k = np.zeros((n+1, 1))
+            y_k = np.zeros((n+1, dim))
+            y_k[0] = np.array([-5])
         #loop para calcular os valores de y
+            for i in range(n):
+                y_k[i+1] = y_k[i] + self.phi(t_k[i], y_k[i], h, TBP)
+                t_k[i+1] = t_k[i] + h
         
-        #PLANETA
-        #for i in range(30*n):
-        
-        #MANUFATURA
-        for i in range(n):
-            y_k[i+1] = y_k[i] + self.phi(t_k[i], y_k[i], h)
-            t_k[i+1] = t_k[i] + h
-
         return y_k, t_k
     
-    def converte(self, n):
-        #y_k, t_k = self.calcula(100, [0, 1], 12)
-        y_k, t_k = self.calcula(n, [0, 2], 1)
-        i = 1
-        #PLANETAS
-        # pos1 = np.array([y_k[0][0], y_k[0][1]])
-        # pos2 = np.array([y_k[0][2], y_k[0][3]])
-        # pos3 = np.array([y_k[0][4], y_k[0][5]])
-        # for i in range(30*n):
-        #     pos1 = np.vstack([pos1, np.array([y_k[i][0], y_k[i][1]])])
-        #     pos2 = np.vstack([pos2, np.array([y_k[i][2], y_k[i][3]])])
-        #     pos3 = np.vstack([pos3, np.array([y_k[i][4], y_k[i][5]])])
-        #return pos1, pos2, pos3
+    def converte(self, n, TBP):
+        """n: numero de passos
+           TBP: True se for para os planetas, False se for para a manufatura"""
+        if TBP:
+            #PLANETAS
+            y_k, t_k = self.calcula(100, [0, 1], 12, TBP)
+            pos1 = np.array([y_k[0][0], y_k[0][1]])
+            pos2 = np.array([y_k[0][2], y_k[0][3]])
+            pos3 = np.array([y_k[0][4], y_k[0][5]])
+            for i in range(30*n):
+                pos1 = np.vstack([pos1, np.array([y_k[i][0], y_k[i][1]])])
+                pos2 = np.vstack([pos2, np.array([y_k[i][2], y_k[i][3]])])
+                pos3 = np.vstack([pos3, np.array([y_k[i][4], y_k[i][5]])])
+            return pos1, pos2, pos3, t_k
         
-        #MANUFATURA
-        return y_k, t_k
+        else:
+            #MANUFATURA
+            y_k, t_k = self.calcula(n, [0, 2], 1, TBP)
+            i = 1
+            return y_k, t_k
     
     def rungekutta_planetas(self, corpo_1, corpo_2, corpo_3, n, T):
 
