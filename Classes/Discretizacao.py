@@ -1,36 +1,97 @@
 import numpy as np
 from Classes.Planeta import Planeta
 
+massa = 1
+G = 1
+
 class Discretizacao:
     
     def __init__(self):
         pass
-        
     
-    def rungekutta(self, y_0, f, n, intervalo_t):
+    #f(t, y) para o caso dos planetas
+    def f(self, t, y): #y_k[i]
+        #funcao para calcular a aceleracao
+        a1 = lambda c1, c2, c3: c1.ac_rel(c2) + c1.ac_rel(c3)
+        a2 = lambda c1, c2, c3: c2.ac_rel(c1) + c2.ac_rel(c3)
+        a3 = lambda c1, c2, c3: c3.ac_rel(c2) + c3.ac_rel(c1)
+
+        #Criando os planetas
+        planeta_1 = Planeta(np.array([y[0], y[1]]), massa, np.array([y[6], y[7]]))
+        planeta_2 = Planeta(np.array([y[2], y[3]]), massa, np.array([y[8], y[9]]))
+        planeta_3 = Planeta(np.array([y[4], y[5]]), massa, np.array([y[10], y[11]]))
+
+        #declara o vetor de retorno
+        k = np.array([0.0, 0.0,
+                      0.0, 0.0,
+                      0.0, 0.0,
+                      0.0, 0.0,
+                      0.0, 0.0,
+                      0.0, 0.0])
+
+        #derivada da posicao = velocidade
+        k[0], k[1] = planeta_1.velocidade[0], planeta_1.velocidade[1] 
+        k[2], k[3] = planeta_2.velocidade[0], planeta_2.velocidade[1] 
+        k[4], k[5] = planeta_3.velocidade[0], planeta_3.velocidade[1] 
+
+        #derivada da velocidade = aceleracao
+        k[6], k[7] = a1(planeta_1, planeta_2, planeta_3)
+        k[8], k[9] = a2(planeta_1, planeta_2, planeta_3)
+        k[10], k[11] = a3(planeta_1, planeta_2, planeta_3)
+
+        return k
+
+    #phi generico
+    def phi(self, t, y, h):
+        #declarando phi do Runge-Kutta
+        k_1 = h*self.f(t, y)
+        k_2 = h*self.f(t + h/2, y + k_1/2)
+        k_3 = h*self.f(t + h/2, y + k_2/2)
+        k_4 = h*self.f(t + h, y + k_3)
+
+        return (k_1 + 2*k_2 + 2*k_3 + k_4)/6
+
+    #metodo de discretizacao
+    def calcula(self, n, intervalo_t, dim):
         #discretizacao do intervalo
         h = (intervalo_t[1] - intervalo_t[0])/n
 
         #inicializacao das variaveis
-        t = intervalo_t[0]
-        y = y_0
-        v_t = [t]
-        v_y = [y]
+        i = 0
+        t_k = np.zeros((n+1, 1))
+        y_k = np.zeros((n+1, dim))
+
+        #inicializacao das condicoes iniciais
+        t_k[0] = intervalo_t[0]
+        y_k[0] = np.array([
+            -0.97000436, 0.24308753,        #R_1: 0, 1
+            0.97000436, -0.24308753,        #R_2: 2, 3
+            0, 0,                           #R_3: 4, 5
+
+            0.4662036850, 0.4323657300,     #V_1: 6, 7
+            0.4662036850, 0.4323657300,     #V_2: 8, 9
+            -0.93240737, -0.86473146        #V_3: 10, 11
+        ])  
 
         #loop para calcular os valores de y
-        while t < intervalo_t[1]:
-            k_1 = h*f(t, y)
-            k_2 = h*f(t + h/2, y + k_1/2)
-            k_3 = h*f(t +h/2, y + k_2/2)
-            k_4 = h*f(t + h, y + k_3)
+        for i in range(n):
+            y_k[i+1] = y_k[i] + self.phi(t_k, y_k[i], h)
+            t_k[i+1] = t_k[i] + h
 
-            y = y + (k_1 + 2*k_2 + 2*k_3 + k_4)/6
-            t = t + h
-            v_t.append(t)
-            v_y.append(y)
-            
-        return v_t, v_y
+        return y_k, t_k
     
+    def converte(self, n):
+        y_k, t_k = self.calcula(100, [0, 1], 12)
+        i = 1
+        pos1 = np.array([y_k[0][0], y_k[0][1]])
+        pos2 = np.array([y_k[0][2], y_k[0][3]])
+        pos3 = np.array([y_k[0][4], y_k[0][5]])
+        for i in range(n):
+            pos1 = np.vstack([pos1, np.array([y_k[i][0], y_k[i][1]])])
+            pos2 = np.vstack([pos2, np.array([y_k[i][2], y_k[i][3]])])
+            pos3 = np.vstack([pos3, np.array([y_k[i][4], y_k[i][5]])])
+
+        return pos1, pos2, pos3
     
     def rungekutta_planetas(self, corpo_1, corpo_2, corpo_3, n, T):
 

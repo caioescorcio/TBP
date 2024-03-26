@@ -17,11 +17,11 @@ corpo_1 = Planeta(np.array([-0.97000436, 0.24308753]), massa, v_0)
 corpo_2 = Planeta(np.array([0.97000436, -0.24308753]), massa, v_0)
 corpo_3 = Planeta(np.array([0, 0]), massa, np.array([-0.93240737, -0.86473146]))
 labels = ['Corpo 1', 'Corpo 2', 'Corpo 3']
-n = 100
+n = 1000
 T = 1
 discretizacao = disc()
 np.set_printoptions(threshold=np.inf)
-pos1, pos2, pos3 = discretizacao.rungekutta_planetas(corpo_1, corpo_2, corpo_3, n, T)
+pos1, pos2, pos3 = discretizacao.converte(100)
 
 fig, ax = plt.subplots()
 
