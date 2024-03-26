@@ -109,7 +109,7 @@ class Discretizacao:
            TBP: True se for para os planetas, False se for para a manufatura"""
         if TBP:
             #PLANETAS
-            y_k, t_k = self.calcula(100, [0, 1], 12, TBP)
+            y_k, t_k = self.calcula(n, [0, 1], 12, TBP)
             pos1 = np.array([y_k[0][0], y_k[0][1]])
             pos2 = np.array([y_k[0][2], y_k[0][3]])
             pos3 = np.array([y_k[0][4], y_k[0][5]])
