@@ -13,9 +13,6 @@ massa = 1
 v_0 = np.array([0.4662036850, 0.4323657300])
 a, b = 3, 4
 
-corpo_1 = Planeta(np.array([-0.97000436, 0.24308753]), massa, v_0)
-corpo_2 = Planeta(np.array([0.97000436, -0.24308753]), massa, v_0)
-corpo_3 = Planeta(np.array([0, 0]), massa, np.array([-0.93240737, -0.86473146]))
 labels = ['Corpo 1', 'Corpo 2', 'Corpo 3']
 n = 1000
 T = 1
