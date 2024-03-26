@@ -58,8 +58,8 @@ class Discretizacao:
 
         #inicializacao das variaveis
         i = 0
-        t_k = np.zeros((n+1, 1))
-        y_k = np.zeros((n+1, dim))
+        t_k = np.zeros((30*n+1, 1))
+        y_k = np.zeros((30*n+1, dim))
 
         #inicializacao das condicoes iniciais
         t_k[0] = intervalo_t[0]
@@ -74,7 +74,7 @@ class Discretizacao:
         ])  
 
         #loop para calcular os valores de y
-        for i in range(n):
+        for i in range(30*n):
             y_k[i+1] = y_k[i] + self.phi(t_k, y_k[i], h)
             t_k[i+1] = t_k[i] + h
 
@@ -86,7 +86,7 @@ class Discretizacao:
         pos1 = np.array([y_k[0][0], y_k[0][1]])
         pos2 = np.array([y_k[0][2], y_k[0][3]])
         pos3 = np.array([y_k[0][4], y_k[0][5]])
-        for i in range(n):
+        for i in range(30*n):
             pos1 = np.vstack([pos1, np.array([y_k[i][0], y_k[i][1]])])
             pos2 = np.vstack([pos2, np.array([y_k[i][2], y_k[i][3]])])
             pos3 = np.vstack([pos3, np.array([y_k[i][4], y_k[i][5]])])
