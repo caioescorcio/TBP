@@ -73,22 +73,30 @@ class Discretizacao:
             #PLANETAS
             #inicializacao das variaveis
             i = 0
-            t_k = np.zeros((30*n+1, 1))
-            y_k = np.zeros((30*n+1, dim))
+            t_k = np.zeros((n+1, 1))
+            y_k = np.zeros((n+1, dim))
             
             #inicializacao das condicoes iniciais
             t_k[0] = intervalo_t[0]
             y_k[0] = np.array([
-                -0.97000436, 0.24308753,        #R_1: 0, 1
-                0.97000436, -0.24308753,        #R_2: 2, 3
-                0, 0,                           #R_3: 4, 5
+            -0.97000436, 0.24308753,        #R_1: 0, 1
+            0.97000436, -0.24308753,        #R_2: 2, 3
+            0, 0,                           #R_3: 4, 5
 
-                0.4662036850, 0.4323657300,     #V_1: 6, 7
-                0.4662036850, 0.4323657300,     #V_2: 8, 9
-                -0.93240737, -0.86473146        #V_3: 10, 11
-            ])  
+            0.4662036850, 0.4323657300,     #V_1: 6, 7
+            0.4662036850, 0.4323657300,     #V_2: 8, 9
+            -0.93240737, -0.86473146        #V_3: 10, 11
+        ])  
+            # y_k[0] = np.array([
+            #     -1.0, 0.0,
+            #      1.0, 0.0,
+            #      0.0, 0.0,
+            #      0.0, 1.2,
+            #      0.0, -1.0,
+            #      0.0, 0.0]
+            # )
             #loop para calcular valores de y        
-            for i in range(30*n):
+            for i in range(n):
                 y_k[i+1] = y_k[i] + self.phi(t_k[i], y_k[i], h, TBP)
                 t_k[i+1] = t_k[i] + h
             
@@ -109,11 +117,11 @@ class Discretizacao:
            TBP: True se for para os planetas, False se for para a manufatura"""
         if TBP:
             #PLANETAS
-            y_k, t_k = self.calcula(n, [0, 1], 12, TBP)
+            y_k, t_k = self.calcula(n, [0, 30], 12, TBP)
             pos1 = np.array([y_k[0][0], y_k[0][1]])
             pos2 = np.array([y_k[0][2], y_k[0][3]])
             pos3 = np.array([y_k[0][4], y_k[0][5]])
-            for i in range(30*n):
+            for i in range(n):
                 pos1 = np.vstack([pos1, np.array([y_k[i][0], y_k[i][1]])])
                 pos2 = np.vstack([pos2, np.array([y_k[i][2], y_k[i][3]])])
                 pos3 = np.vstack([pos3, np.array([y_k[i][4], y_k[i][5]])])

@@ -18,7 +18,7 @@ n = 1000
 T = 1
 discretizacao = disc()
 np.set_printoptions(threshold=np.inf)
-pos1, pos2, pos3, t = discretizacao.converte(100, True)
+pos1, pos2, pos3, t = discretizacao.converte(100*30, True)
 
 fig, ax = plt.subplots()
 
