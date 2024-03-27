@@ -17,9 +17,9 @@ class Discretizacao:
         a3 = lambda c1, c2, c3: c3.ac_rel(c2) + c3.ac_rel(c1)
 
         #Criando os planetas
-        planeta_1 = Planeta(np.array([y[0], y[1]]), massa, np.array([y[6], y[7]]))
-        planeta_2 = Planeta(np.array([y[2], y[3]]), massa, np.array([y[8], y[9]]))
-        planeta_3 = Planeta(np.array([y[4], y[5]]), massa, np.array([y[10], y[11]]))
+        planeta_1 = Planeta(np.array([y[0], y[1]]), massa , np.array([y[6], y[7]]))
+        planeta_2 = Planeta(np.array([y[2], y[3]]), massa , np.array([y[8], y[9]]))
+        planeta_3 = Planeta(np.array([y[4], y[5]]), massa , np.array([y[10], y[11]]))
 
         #declara o vetor de retorno
         k = np.array([0.0, 0.0,
@@ -28,7 +28,7 @@ class Discretizacao:
                       0.0, 0.0,
                       0.0, 0.0,
                       0.0, 0.0])
-
+        
         #derivada da posicao = velocidade
         k[0], k[1] = planeta_1.velocidade[0], planeta_1.velocidade[1] 
         k[2], k[3] = planeta_2.velocidade[0], planeta_2.velocidade[1] 
@@ -39,6 +39,7 @@ class Discretizacao:
         k[8], k[9] = a2(planeta_1, planeta_2, planeta_3)
         k[10], k[11] = a3(planeta_1, planeta_2, planeta_3)
 
+        
         return k
 
     #phi generico
@@ -49,10 +50,10 @@ class Discretizacao:
         else:
             func = self.f_manufaturada
         #declarando phi do Runge-Kutta
-        k_1 = h*func(t, y)
-        k_2 = h*func(t + h/2, y + k_1/2)
-        k_3 = h*func(t + h/2, y + k_2/2)
-        k_4 = h*func(t + h, y + k_3)
+        k_1 = func(t, y)
+        k_2 = func(t + h/2, y + h*k_1/2)
+        k_3 = func(t + h/2, y + h*k_2/2)
+        k_4 = func(t + h, y + h*k_3)
 
         return (k_1 + 2*k_2 + 2*k_3 + k_4)/6
 
@@ -97,8 +98,9 @@ class Discretizacao:
             # )
             #loop para calcular valores de y        
             for i in range(n):
-                y_k[i+1] = y_k[i] + self.phi(t_k[i], y_k[i], h, TBP)
+                y_k[i+1] = y_k[i] + h*self.phi(t_k[i], y_k[i], h, TBP)
                 t_k[i+1] = t_k[i] + h
+                print(y_k[i+1])
             
         else:
             #MANUFATURA
@@ -107,9 +109,9 @@ class Discretizacao:
             y_k[0] = np.array([-5])
         #loop para calcular os valores de y
             for i in range(n):
-                y_k[i+1] = y_k[i] + self.phi(t_k[i], y_k[i], h, TBP)
+                y_k[i+1] = y_k[i] + h*self.phi(t_k[i], y_k[i], h, TBP)
                 t_k[i+1] = t_k[i] + h
-        
+                
         return y_k, t_k
     
     def converte(self, n, TBP):
@@ -117,19 +119,19 @@ class Discretizacao:
            TBP: True se for para os planetas, False se for para a manufatura"""
         if TBP:
             #PLANETAS
-            y_k, t_k = self.calcula(n, [0, 30], 12, TBP)
+            y_k, t_k = self.calcula(n, [0, 1], 12, TBP)
             pos1 = np.array([y_k[0][0], y_k[0][1]])
             pos2 = np.array([y_k[0][2], y_k[0][3]])
             pos3 = np.array([y_k[0][4], y_k[0][5]])
             for i in range(n):
-                pos1 = np.vstack([pos1, np.array([y_k[i][0], y_k[i][1]])])
-                pos2 = np.vstack([pos2, np.array([y_k[i][2], y_k[i][3]])])
-                pos3 = np.vstack([pos3, np.array([y_k[i][4], y_k[i][5]])])
+                pos1 = np.vstack([pos1, np.array([y_k[i+1][0], y_k[i+1][1]])])
+                pos2 = np.vstack([pos2, np.array([y_k[i+1][2], y_k[i+1][3]])])
+                pos3 = np.vstack([pos3, np.array([y_k[i+1][4], y_k[i+1][5]])])
             return pos1, pos2, pos3, t_k
         
         else:
             #MANUFATURA
-            y_k, t_k = self.calcula(n, [0, 2], 1, TBP)
+            y_k, t_k = self.calcula(n, [0, 31.99], 1, TBP)
             i = 1
             return y_k, t_k
     
