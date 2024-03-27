@@ -41,8 +41,6 @@ class CubicSpline():
         self.b = np.zeros(self.n)
         self.d = np.zeros(self.n)
         
-        print(len(self.c), len(self.z), len(self.mu), len(self.y), len(self.h), len(self.b))
-        print(len(self.c[-1:1:-1]), len( 2*self.c[-2:0:-1]))
         for i in range(self.n-2, 0, -1):
             self.c[i] = self.z[i] - self.mu[i]*self.c[i+1]
             
@@ -58,8 +56,11 @@ class CubicSpline():
         return y
         
     def Substitui(self, x):
-        idx = np.searchsorted(self.x, x, side="right") - 1 #encontra o indice do intervalo no qual x esta contido
-        return self.splines[idx][0] + self.splines[idx][1]*(x-self.x[idx]) + self.splines[idx][2]*(x-self.x[idx])**2 + self.splines[idx][3]*(x-self.x[idx])**3
+        if x == self.x[-1]:
+            return self.y[-1]
+        else:
+            idx = np.searchsorted(self.x, x, side="right") - 1 #encontra o indice do intervalo no qual x esta contido
+            return self.splines[idx][0] + self.splines[idx][1]*(x-self.x[idx]) + self.splines[idx][2]*(x-self.x[idx])**2 + self.splines[idx][3]*(x-self.x[idx])**3
         
         
         

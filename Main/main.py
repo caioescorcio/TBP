@@ -18,7 +18,7 @@ n = 1000
 T = 1
 discretizacao = disc()
 np.set_printoptions(threshold=np.inf)
-pos1, pos2, pos3, t = discretizacao.converte(100*30, True)
+pos1, pos2, pos3, t = discretizacao.converte(4096, True)
 
 fig, ax = plt.subplots()
 
@@ -72,18 +72,18 @@ csy = np.array(list(map( lambda pos: CubicSpline(t, pos[:, 1]), pos_stack)))
 fig = go.Figure()
 
 # Add real values
-fig.add_trace(go.Scatter(x=pos1[:, 0], y=pos1[:, 1], mode='lines', name='Real Pos1'))
+fig.add_trace(go.Scatter(x=pos1[:, 0], y=pos1[:, 1], mode='lines', name='Runge Kutta'))
 # fig.add_trace(go.Scatter(x=pos2[:, 0], y=pos2[:, 1], mode='lines', name='Real Pos2'))
 # fig.add_trace(go.Scatter(x=pos3[:, 0], y=pos3[:, 1], mode='lines', name='Real Pos3'))
 
 # # Add spline predictions
 # for i in range(len(pos_stack)):
 #     fig.add_trace(go.Scatter(x=csx[i](t_plot), y=csy[i](t_plot), mode='lines', name=f'Spline Pos{i+1}'))
-fig.add_trace(go.Scatter(x=csx[0](t_plot)[0:], y=csy[0](t_plot)[0:], mode='lines', name=f'Spline Pos 1'))
+fig.add_trace(go.Scatter(x=csx[0](t_plot)[0:], y=csy[0](t_plot)[0:], mode='lines', name=f'Spline Cúbico'))
 
 # Set layout
 fig.update_layout(
-    title='Movimento de tres bolas',
+    title='Movimento dos 3 corpos',
     xaxis_title='X (m)',
     yaxis_title='Y (m)',
     legend_title='Legend',
