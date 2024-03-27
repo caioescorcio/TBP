@@ -130,7 +130,7 @@ class Discretizacao:
         
         else:
             #MANUFATURA
-            y_k, t_k = self.calcula(n, [0, 31.99], 1, TBP)
+            y_k, t_k = self.calcula(n, [0, 2], 1, TBP)
             i = 1
             return y_k, t_k
     
