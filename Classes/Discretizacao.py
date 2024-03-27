@@ -100,7 +100,6 @@ class Discretizacao:
             for i in range(n):
                 y_k[i+1] = y_k[i] + h*self.phi(t_k[i], y_k[i], h, TBP)
                 t_k[i+1] = t_k[i] + h
-                print(y_k[i+1])
             
         else:
             #MANUFATURA
