@@ -125,9 +125,9 @@ class Discretizacao:
             pos2 = np.array([y_k[0][2], y_k[0][3]])
             pos3 = np.array([y_k[0][4], y_k[0][5]])
             for i in range(n):
-                pos1 = np.vstack([pos1, np.array([y_k[i][0], y_k[i][1]])])
-                pos2 = np.vstack([pos2, np.array([y_k[i][2], y_k[i][3]])])
-                pos3 = np.vstack([pos3, np.array([y_k[i][4], y_k[i][5]])])
+                pos1 = np.vstack([pos1, np.array([y_k[i + 1][0], y_k[i + 1][1]])])
+                pos2 = np.vstack([pos2, np.array([y_k[i + 1][2], y_k[i + 1][3]])])
+                pos3 = np.vstack([pos3, np.array([y_k[i + 1][4], y_k[i + 1][5]])])
             return pos1, pos2, pos3, t_k
         
         else:

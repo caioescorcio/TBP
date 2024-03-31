@@ -118,15 +118,22 @@ class Discretizacao:
            TBP: True se for para os planetas, False se for para a manufatura"""
         if TBP:
             #PLANETAS
-            y_k, t_k = self.calcula(n, [0, 1], 12, TBP)
+            y_k, t_k = self.calcula(n, [0, 8], 12, TBP)
             pos1 = np.array([y_k[0][0], y_k[0][1]])
             pos2 = np.array([y_k[0][2], y_k[0][3]])
             pos3 = np.array([y_k[0][4], y_k[0][5]])
+            v1 = np.array([y_k[0][6], y_k[0][7]])
+            v2 = np.array([y_k[0][8], y_k[0][9]])
+            v3 = np.array([y_k[0][10], y_k[0][11]])
             for i in range(n):
                 pos1 = np.vstack([pos1, np.array([y_k[i+1][0], y_k[i+1][1]])])
                 pos2 = np.vstack([pos2, np.array([y_k[i+1][2], y_k[i+1][3]])])
                 pos3 = np.vstack([pos3, np.array([y_k[i+1][4], y_k[i+1][5]])])
-            return pos1, pos2, pos3, t_k
+                v1 = np.vstack([v1, np.array([y_k[i+1][6], y_k[i+1][7]])])
+                v2 = np.vstack([v2, np.array([y_k[i+1][8], y_k[i+1][9]])])
+                v3 = np.vstack([v3, np.array([y_k[i+1][10], y_k[i+1][11]])])
+            return pos1, pos2, pos3, v1, v2, v3, t_k
+            #return pos1, pos2, pos3, t_k
         
         else:
             #MANUFATURA
