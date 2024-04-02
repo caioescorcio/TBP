@@ -1,11 +1,12 @@
-#!/usr/bin/env python3
-
-# To directly call tably from shell, set a symbolic link by running
-# ln -sf $PWD/tably.py /usr/local/bin/tably
-
 import argparse
 import csv
 import os
+
+#!/usr/bin/env python3
+
+# Para chamar diretamente o tably a partir do shell, crie um link simbólico executando
+# ln -sf $PWD/tably.py /usr/local/bin/tably
+
 
 
 PREAMBLE = r"""\documentclass[11pt, a4paper]{article}
@@ -26,38 +27,38 @@ CAPTION = '\n{indent}\\caption{{{caption}}}'
 
 
 class Tably:
-    """Object which holds parsed arguments.
+    """Objeto que armazena os argumentos analisados.
 
-    Methods:
-        run: selects the appropriate methods to generate LaTeX code/files
-        create_table: for each specified file, creates a LaTeX table
-        create_row: creates a row based on `line` content
-        combine_tables: combines all tables from input files together
-        save_single_table: creates and saves a single LaTeX table
-        get_units: writes the units as a row of the LaTeX table
+    Métodos:
+        run: seleciona os métodos apropriados para gerar código/arquivos LaTeX
+        create_table: para cada arquivo especificado, cria uma tabela LaTeX
+        create_row: cria uma linha com base no conteúdo da `line`
+        combine_tables: combina todas as tabelas dos arquivos de entrada
+        save_single_table: cria e salva uma única tabela LaTeX
+        get_units: escreve as unidades como uma linha da tabela LaTeX
     """
 
     def __init__(self, args):
         """
-        Attributes:
-            files (string): name(s) of the .csv file(s)
-            no_header (bool): if the .csv contains only content, without a
-                header (names for the columns)
-            caption (string): the name of the table, printed above it
-            label (string): a label by which the table can be referenced
-            align (string): wanted alignment of the columns
-            no_indent (bool): should a LaTeX code be indented with 4 spaces per
-                code block. Doesn't affect the final looks of the table.
-            outfile (string): name of the file where to save the results.
-            separate_outfiles (list): names of the files where each table is saved
-            skip (int): number of rows in .csv to skip
-            preamble(bool): create a preamble
-            sep (string): column separator
-            units (list): units for each column
-            fragment (bool): only output content in tabular environment
-            fragment_skip_header (bool): shortcut of passing -k 1 -n -f
-            replace (bool): replace existing output file if -o is passed
-            tex_str (function): escape LaTeX special characters or do nothing
+        Atributos:
+            files (string): nome(s) do(s) arquivo(s) .csv
+            no_header (bool): se o .csv contém apenas conteúdo, sem um
+                cabeçalho (nomes das colunas)
+            caption (string): o nome da tabela, impresso acima dela
+            label (string): um rótulo pelo qual a tabela pode ser referenciada
+            align (string): alinhamento desejado das colunas
+            no_indent (bool): deve o código LaTeX ser indentado com 4 espaços por
+                bloco de código. Não afeta a aparência final da tabela.
+            outfile (string): nome do arquivo onde salvar os resultados.
+            separate_outfiles (list): nomes dos arquivos onde cada tabela é salva
+            skip (int): número de linhas no .csv para pular
+            preamble(bool): criar um preâmbulo
+            sep (string): separador de colunas
+            units (list): unidades para cada coluna
+            fragment (bool): apenas saída de conteúdo no ambiente tabular
+            fragment_skip_header (bool): atalho para passar -k 1 -n -f
+            replace (bool): substituir arquivo de saída existente se -o for passado
+            tex_str (function): escapar caracteres especiais do LaTeX ou não fazer nada
         """
         self.files = args.files
         self.no_header = args.no_header
@@ -77,14 +78,14 @@ class Tably:
         self.tex_str = escape if not args.no_escape else lambda x: x
 
     def run(self):
-        """The main method.
+        """O método principal.
 
-        If all tables need to be put into a single file,
-        calls `combine_tables` method to generate LaTeX code
-        and then calls `save_content` function if `outfile` is provided;
-        otherwise, prints to the console.
-        If each table needs to be put into a separate file,
-        calls `save_single_table` method to create and save each table separately.
+        Se todas as tabelas precisarem ser colocadas em um único arquivo,
+        chama o método `combine_tables` para gerar o código LaTeX
+        e em seguida chama a função `save_content` se `outfile` for fornecido;
+        caso contrário, imprime no console.
+        Se cada tabela precisar ser colocada em um arquivo separado,
+        chama o método `save_single_table` para criar e salvar cada tabela separadamente.
         """
 
         if self.fragment_skip_header:
@@ -97,7 +98,7 @@ class Tably:
             self.label = None
             self.preamble = False
 
-        # if all tables need to be put into one file
+        # se todas as tabelas precisarem ser colocadas em um único arquivo
         if self.outfile or self.separate_outfiles is None:
             final_content = self.combine_tables()
             if not final_content:
@@ -106,11 +107,11 @@ class Tably:
                 try:
                     save_content(final_content, self.outfile, self.replace)
                 except FileNotFoundError:
-                    print('{} is not a valid/known path. Could not save there.'.format(self.outfile))
+                    print('{} não é um caminho válido/conhecido. Não foi possível salvar lá.'.format(self.outfile))
             else:
                 print(final_content)
 
-        # if -oo is passed (could be [])
+        # se -oo for passado (pode ser [])
         if self.separate_outfiles is not None:
             outs = self.separate_outfiles
             if len(outs) == 0:
@@ -118,16 +119,16 @@ class Tably:
             elif os.path.isdir(outs[0]):
                 outs = [ os.path.join(outs[0], os.path.splitext(os.path.basename(file))[0])+'.tex' for file in self.files ]
             elif len(outs) != len(self.files):
-                print('WARNING: Number of .csv files and number of output files do not match!')
+                print('AVISO: O número de arquivos .csv e o número de arquivos de saída não correspondem!')
             for file, out in zip(self.files, outs):
                 self.save_single_table(file, out)
 
     def create_table(self, file):
-        """Creates a table from a given .csv file.
+        """Cria uma tabela a partir de um arquivo .csv fornecido.
 
-        This method gives the procedure of converting a .csv file to a LaTeX table.
-        Unless -f is specified, the output is a ready-to-use LaTeX table environment.
-        All other methods that need to obtain a LaTeX table from a .csv file call this method.
+        Este método fornece o procedimento de conversão de um arquivo .csv em uma tabela LaTeX.
+        A menos que -f seja especificado, a saída é um ambiente de tabela LaTeX pronto para uso.
+        Todos os outros métodos que precisam obter uma tabela LaTeX de um arquivo .csv chamam este método.
         """
         rows = []
         indent = 4*' ' if not self.no_indent else ''
@@ -139,17 +140,17 @@ class Tably:
                         continue
                     rows.append(self.create_row(columns, indent))
         except FileNotFoundError:
-            print("File {} doesn't exist!!\n".format(file))
+            print("O arquivo {} não existe!!\n".format(file))
             return ''
         if not rows:
-            print("No table created from the {} file. Check if the file is empty "
-                  "or you used too high skip value.\n".format(file))
+            print("Nenhuma tabela criada a partir do arquivo {}. Verifique se o arquivo está vazio "
+                  "ou se você usou um valor de pular muito alto.\n".format(file))
             return ''
 
         if not self.no_header:
             rows.insert(1, r'{0}{0}\midrule'.format(indent))
             if self.units:
-                rows[0] = rows[0] + r'\relax' # fixes problem with \[
+                rows[0] = rows[0] + r'\relax' # corrige problema com \[
                 units = self.get_units()
                 rows.insert(1, r'{0}{0}{1} \\'.format(indent, units))
 
@@ -167,19 +168,19 @@ class Tably:
             return content
 
     def create_row(self, line, indent):
-        """Creates a row based on `line` content"""
+        """Cria uma linha com base no conteúdo da `line`"""
         return r'{indent}{indent}{content} \\ \hline'.format(
              indent=indent,
              content=' & '.join(self.tex_str(line)))
 
     def combine_tables(self):
-        """Combine all tables together and add a preamble if required.
+        """Combina todas as tabelas e adiciona um preâmbulo, se necessário.
 
-        Unless -oo is specified, this is how input tables are arranged.
+        A menos que -oo seja especificado, assim são organizadas as tabelas de entrada.
         """
         all_tables = []
         if self.label and len(self.files) > 1:
-            all_tables.append("% don't forget to manually re-label the tables")
+            all_tables.append("% não se esqueça de rotular manualmente as tabelas")
 
         for file in self.files:
             table = self.create_table(file)
@@ -193,7 +194,7 @@ class Tably:
         return '\n\n'.join(all_tables)
 
     def save_single_table(self, file, out):
-        """Creates and saves a single LaTeX table"""
+        """Cria e salva uma única tabela LaTeX"""
         table = [self.create_table(file)]
         if table:
             if self.preamble:
@@ -203,10 +204,10 @@ class Tably:
             try:
                 save_content(final_content, out, self.replace)
             except FileNotFoundError:
-                print('{} is not a valid/known path. Could not save there.'.format(out))
+                print('{} não é um caminho válido/conhecido. Não foi possível salvar lá.'.format(out))
 
     def get_units(self):
-        """Writes the units as a row of the LaTeX table"""
+        """Escreve as unidades como uma linha da tabela LaTeX"""
         formatted_units = []
         for unit in self.tex_str(self.units):
             if unit in '-/0':
@@ -228,21 +229,20 @@ def get_sep(sep):
 
 
 def escape(line):
-    """Escapes special LaTeX characters by prefixing them with backslash"""
+    """Escapa caracteres especiais do LaTeX prefixando-os com uma barra invertida"""
     for char in '#$%&_}{':
         line = [column.replace(char, '\\'+char) for column in line]
     return line
 
 
 def format_alignment(align, length):
-    """Makes sure that provided alignment is valid:
-    1. the length of alignment is either 1 or the same as the number of columns
-    2. valid characters are `l`, `c` and `r`
+    """Garante que o alinhamento fornecido seja válido:
+    1. o comprimento do alinhamento é 1 ou o mesmo que o número de colunas
+    2. os caracteres válidos são `l`, `c` e `r`
 
-    If there is an invalid character, all columns are set to centered alignment.
-    If alignment length is too long, it is stripped to fit the number of columns.
-    If alignment length is too short, it is padded with `c` for the missing
-    columns.
+    Se houver um caractere inválido, todas as colunas são definidas como alinhamento centralizado.
+    Se o comprimento do alinhamento for muito longo, ele é reduzido para caber no número de colunas.
+    Se o comprimento do alinhamento for muito curto, ele é preenchido com `c` para as colunas faltantes.
     """
     if any(ch not in 'lcr' for ch in align):
         align = 'c'
@@ -256,138 +256,138 @@ def format_alignment(align, length):
 
 
 def add_label(label, indent):
-    """Creates a table label"""
+    """Cria um rótulo para a tabela"""
     return LABEL.format(label=label, indent=indent) if label else ''
 
 
 def add_caption(caption, indent):
-    """Creates a table caption"""
+    """Cria uma legenda para a tabela"""
     return CAPTION.format(caption=caption, indent=indent) if caption else ''
 
 
 def save_content(content, outfile, replace):
-    """Saves the content to a file.
+    """Salva o conteúdo em um arquivo.
 
-    If an existing file is provided, the content is appended to the end
-    of the file by default. If -r is passed, the file is overwritten.
+    Se um arquivo existente for fornecido, o conteúdo é anexado ao final
+    do arquivo por padrão. Se -r for passado, o arquivo é substituído.
     """
     if replace:
         with open(outfile, 'w') as out:
             out.writelines(content)
-        print('The content is written to', outfile)
+        print('O conteúdo foi escrito em', outfile)
     else:
         with open(outfile, 'a') as out:
             out.writelines(content)
-        print('The content is appended to', outfile)
+        print('O conteúdo foi anexado a', outfile)
 
 
 
 def arg_parser():
-    """Parses command line arguments and provides --help"""
-    parser = argparse.ArgumentParser(description="Creates LaTeX tables from .csv files")
+    """Analisa os argumentos da linha de comando e fornece --help"""
+    parser = argparse.ArgumentParser(description="Cria tabelas LaTeX a partir de arquivos .csv")
 
     parser.add_argument(
         'files',
         nargs='+',
-        help='.csv file(s) containing the data you want to export.'
+        help='Arquivo(s) .csv contendo os dados que você deseja exportar.'
     )
     parser.add_argument(
         '-a', '--align',
         default='c',
-        help='Alignment for the columns of the table. '
-             'Use `l`, `c`, and `r` for left, center and right. '
-             'Either one character for all columns, or one character per column. '
-             'Default: c'
+        help='Alinhamento das colunas da tabela. '
+             'Use `l`, `c` e `r` para esquerda, centro e direita. '
+             'Um único caractere para todas as colunas ou um caractere por coluna. '
+             'Padrão: c'
     )
     parser.add_argument(
         '-c', '--caption',
-        help='Caption of the table. '
-             'Default: None'
+        help='Legenda da tabela. '
+             'Padrão: Nenhum'
     )
     parser.add_argument(
         '-i', '--no-indent',
         action='store_true',
-        help='Pass this if you do not want to indent LaTeX source code '
-             'with 4 spaces per float. No difference in the final result (pdf). '
-             'Default: False'
+        help='Passe isso se você não quiser indentar o código fonte LaTeX '
+             'com 4 espaços por bloco. Nenhuma diferença no resultado final (pdf). '
+             'Padrão: False'
     )
     parser.add_argument(
         '-k', '--skip',
         type=int,
         default=0,
-        help='Number of rows in .csv to skip. Default: 0'
+        help='Número de linhas no .csv para pular. Padrão: 0'
     )
     parser.add_argument(
         '-l', '--label',
-        help='Label of the table, for referencing it. Default: None'
+        help='Rótulo da tabela, para referenciá-la. Padrão: Nenhum'
     )
     parser.add_argument(
         '-n', '--no-header',
         action='store_true',
-        help='By default, the first row of .csv is used as a table header. '
-             'Pass this option if there is no header. Default: False'
+        help='Por padrão, a primeira linha do .csv é usada como cabeçalho da tabela. '
+             'Passe esta opção se não houver cabeçalho. Padrão: False'
     )
     parser.add_argument(
         '-o', '--outfile',
-        help='Choose an output file to save the results. '
-             'The results are appended to the file (added after the last line). '
-             'Default: None, prints to console.'
+        help='Escolha um arquivo de saída para salvar os resultados. '
+             'Os resultados são anexados ao arquivo (adicionados após a última linha). '
+             'Padrão: Nenhum, imprime no console.'
     )
     parser.add_argument(
         '-oo', '--separate-outfiles',
         metavar='PATH',
         nargs='*',
-        help='When multiple .csv files need to be processed, '
-             'pass -oo to save each individual table in a separate .tex file. '
-             'To specifiy each individual output file, '
-             'pass a list of filenames after -oo. '
-             'Alternatively, pass a directory that will store all the output files. '
-             'If no filename/directory is passed after -oo, '
-             'filenames of .csv files will be used (with .tex extension).'
+        help='Quando vários arquivos .csv precisam ser processados, '
+             'passe -oo para salvar cada tabela individual em um arquivo .tex separado. '
+             'Para especificar cada arquivo de saída individualmente, '
+             'passe uma lista de nomes de arquivos após -oo. '
+             'Alternativamente, passe um diretório que armazenará todos os arquivos de saída. '
+             'Se nenhum nome de arquivo/diretório for passado após -oo, '
+             'serão usados os nomes de arquivos .csv (com extensão .tex).'
     )
     parser.add_argument(
         '-p', '--preamble',
         action='store_true',
-        help='If selected, makes a whole .tex document (including the preamble) '
-             'ready to be built as .pdf. Useful when trying to make a quick report. '
-             'Default: False'
+        help='Se selecionado, cria um documento .tex completo (incluindo o preâmbulo) '
+             'pronto para ser compilado como .pdf. Útil ao tentar fazer um relatório rápido. '
+             'Padrão: False'
     )
     parser.add_argument(
         '-s', '--sep',
         default=',',
-        help=r'Choose a separator between columns. If a file is tab-separated, '
-             r'pass `t` or `tab`. If a file is semicolon-separated, '
-             r'pass `s`, `semi` or `\;`.'
-             r'Default: `,` (comma-separated)'
+        help=r'Escolha um separador entre colunas. Se um arquivo estiver separado por tabulação, '
+             r'passe `t` ou `tab`. Se um arquivo estiver separado por ponto e vírgula, '
+             r'passe `s`, `semi` ou `\;`.'
+             r'Padrão: `,` (separado por vírgula)'
     )
     parser.add_argument(
         '-u', '--units',
         nargs='+',
-        help='Provide units for each column. If column has no unit, denote it '
-             'by passing either `-`, `/` or `0`. If `--no-header` is used, '
-             'this argument is ignored.'
+        help='Forneça unidades para cada coluna. Se a coluna não tiver unidade, denote-a '
+             'passando `-`, `/` ou `0`. Se `--no-header` for usado, '
+             'este argumento será ignorado.'
     )
     parser.add_argument(
         '-e', '--no-escape',
         action='store_true',
-        help='If selected, do not escape special LaTeX characters.'
+        help='Se selecionado, não escape caracteres especiais do LaTeX.'
     )
     parser.add_argument(
         '-f', '--fragment',
         action='store_true',
-        help='If selected, only output content inside tabular environment '
-             '(no preamble, table environment, etc.).'
+        help='Se selecionado, apenas saída de conteúdo dentro do ambiente tabular '
+             '(sem preâmbulo, ambiente de tabela, etc.).'
     )
     parser.add_argument(
         '-ff', '--fragment-skip-header',
         action='store_true',
-        help='Equivalent to passing -k 1 -n -f '
-             '(suppress header when they are on the first row of .csv and pass -f).'
+        help='Equivalente a passar -k 1 -n -f '
+             '(suprimir cabeçalho quando eles estão na primeira linha do .csv e passar -f).'
     )
     parser.add_argument(
         '-r', '--replace',
         action='store_true',
-        help='If selected and -o or -oo is passed, overwrite any existing output file.'
+        help='Se selecionado e -o ou -oo for passado, substitui qualquer arquivo de saída existente.'
     )
     return parser.parse_args()
 
